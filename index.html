@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD5 Algorithm Study</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 60px 0;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        h2 {
+            color: #2575fc;
+            margin: 25px 0 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        h3 {
+            color: #6a11cb;
+            margin: 20px 0 10px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+        }
+        
+        .algorithm-step {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #2575fc;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .demo-section {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 25px 0;
+            border: 1px solid #d0e3ff;
+        }
+        
+        .input-group {
+            margin: 15px 0;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, textarea, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        button {
+            background: #2575fc;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #1a65e0;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4ff;
+            border-radius: 5px;
+            border-left: 4px solid #2575fc;
+            word-break: break-all;
+        }
+        
+        .hash-visualization {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 15px 0;
+        }
+        
+        .hash-byte {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e0e0e0;
+            border-radius: 3px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .hash-byte.active {
+            background: #2575fc;
+            color: white;
+        }
+        
+        .info-box {
+            background: #fff9e6;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .warning-box {
+            background: #ffe6e6;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .sidebar ul {
+            list-style-type: none;
+        }
+        
+        .sidebar li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar a {
+            color: #2575fc;
+            text-decoration: none;
+            display: block;
+            padding: 8px 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        
+        .sidebar a:hover {
+            background: #f0f7ff;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #777;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MD5 Algorithm Study</h1>
+            <p>Understanding the Message-Digest Algorithm 5 through interactive examples and visualizations</p>
+        </header>
+        
+        <div class="content">
+            <div class="main-content">
+                <section id="introduction">
+                    <h2>Introduction to MD5</h2>
+                    <p>The MD5 algorithm is a widely used cryptographic hash function that produces a 128-bit (16-byte) hash value. It was designed by Ronald Rivest in 1991 to replace the earlier MD4 algorithm.</p>
+                    
+                    <div class="info-box">
+                        <p><strong>Note:</strong> While MD5 was once widely used for security applications, it's now considered cryptographically broken and unsuitable for further use due to vulnerability to collision attacks.</p>
+                    </div>
+                    
+                    <p>Despite its security weaknesses, MD5 is still used in non-cryptographic contexts such as checksums for verifying data integrity.</p>
+                </section>
+                
+                <section id="how-it-works">
+                    <h2>How MD5 Works</h2>
+                    <p>The MD5 algorithm processes input data in 512-bit blocks and produces a fixed-size 128-bit output. The algorithm consists of the following steps:</p>
+                    
+                    <div class="algorithm-step">
+                        <h3>Step 1: Padding</h3>
+                        <p>The input message is padded so that its length is congruent to 448 modulo 512. Padding is always added, even if the message is already the correct length.</p>
+                    </div>
+                    
+                    <div class="algorithm-step">
+                        <h3>Step 2: Append Length</h3>
+                        <p>A 64-bit representation of the original message length (before padding) is appended to the padded message.</p>
+                    </div>
+                    
+                    <div class="algorithm-step">
+                        <h3>Step 3: Initialize MD Buffer</h3>
+                        <p>Four 32-bit registers (A, B, C, D) are initialized to fixed constants:</p>
+                        <div class="code-block">
+                            A = 0x67452301<br>
+                            B = 0xEFCDAB89<br>
+                            C = 0x98BADCFE<br>
+                            D = 0x10325476
+                        </div>
+                    </div>
+                    
+                    <div class="algorithm-step">
+                        <h3>Step 4: Process Blocks</h3>
+                        <p>The message is processed in 512-bit blocks. Each block is processed in four rounds, with each round consisting of 16 operations.</p>
+                    </div>
+                    
+                    <div class="algorithm-step">
+                        <h3>Step 5: Output</h3>
+                        <p>The final hash value is the concatenation of the four registers A, B, C, D after processing all blocks.</p>
+                    </div>
+                </section>
+                
+                <section id="demo">
+                    <h2>MD5 Demo</h2>
+                    <p>Enter text below to see how MD5 processes it and generates a hash:</p>
+                    
+                    <div class="demo-section">
+                        <div class="input-group">
+                            <label for="input-text">Input Text:</label>
+                            <textarea id="input-text" rows="3" placeholder="Enter text to hash">Hello, MD5!</textarea>
+                        </div>
+                        
+                        <button id="hash-button">Generate MD5 Hash</button>
+                        
+                        <div class="result" id="hash-result">
+                            <p><strong>MD5 Hash:</strong> <span id="hash-value">82a9f0f0d38c88d571d7f547e6a0a5f7</span></p>
+                            <div class="hash-visualization" id="hash-visualization">
+                                <!-- Hash bytes will be generated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <p><strong>Security Warning:</strong> MD5 should not be used for security-sensitive applications like password hashing or digital signatures due to known vulnerabilities.</p>
+                    </div>
+                </section>
+                
+                <section id="applications">
+                    <h2>MD5 Applications</h2>
+                    <p>Despite its cryptographic weaknesses, MD5 is still used in various non-security contexts:</p>
+                    
+                    <h3>Data Integrity Checks</h3>
+                    <p>MD5 is commonly used to verify the integrity of files. By comparing the MD5 hash of a downloaded file with the published hash, users can ensure the file hasn't been corrupted.</p>
+                    
+                    <h3>Database Indexing</h3>
+                    <p>MD5 hashes can be used as unique identifiers for database records, especially when dealing with large binary data.</p>
+                    
+                    <h3>Digital Forensics</h3>
+                    <p>In digital forensics, MD5 is used to create unique identifiers for digital evidence, ensuring it hasn't been altered during investigation.</p>
+                </section>
+                
+                <section id="limitations">
+                    <h2>Limitations and Vulnerabilities</h2>
+                    <p>MD5 has several significant security vulnerabilities:</p>
+                    
+                    <h3>Collision Attacks</h3>
+                    <p>It's possible to find two different inputs that produce the same MD5 hash. This makes MD5 unsuitable for digital signatures and certificates.</p>
+                    
+                    <h3>Preimage Attacks</h3>
+                    <p>While more difficult than collision attacks, preimage attacks (finding an input that matches a given hash) are also feasible against MD5.</p>
+                    
+                    <h3>Speed</h3>
+                    <p>MD5 is relatively fast to compute, which makes it vulnerable to brute-force attacks, especially with modern hardware.</p>
+                    
+                    <div class="info-box">
+                        <p><strong>Recommendation:</strong> For security applications, use more secure hash functions like SHA-256 or SHA-3.</p>
+                    </div>
+                </section>
+            </div>
+            
+            <div class="sidebar">
+                <h2>Quick Navigation</h2>
+                <ul>
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#how-it-works">How MD5 Works</a></li>
+                    <li><a href="#demo">MD5 Demo</a></li>
+                    <li><a href="#applications">Applications</a></li>
+                    <li><a href="#limitations">Limitations</a></li>
+                </ul>
+                
+                <h2>Key Facts</h2>
+                <ul>
+                    <li><strong>Hash Size:</strong> 128 bits (16 bytes)</li>
+                    <li><strong>Block Size:</strong> 512 bits</li>
+                    <li><strong>Rounds:</strong> 4 (16 operations each)</li>
+                    <li><strong>Designed:</strong> 1991</li>
+                    <li><strong>Status:</strong> Cryptographically broken</li>
+                </ul>
+                
+                <h2>Related Algorithms</h2>
+                <ul>
+                    <li>MD4 (predecessor)</li>
+                    <li>SHA-1 (more secure)</li>
+                    <li>SHA-256 (current standard)</li>
+                    <li>SHA-3 (new standard)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <footer>
+            <p>MD5 Algorithm Study Blog &copy; 2023 | For educational purposes only</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simple MD5 implementation for demonstration purposes
+        // Note: This is a simplified version for educational purposes
+        // For production use, consider a well-tested library
+        function md5(input) {
+            // Convert string to byte array
+            let msg = stringToUtf8Array(input);
+            
+            // Pre-processing: padding and length appending
+            msg = padMessage(msg);
+            
+            // Initialize variables
+            let a0 = 0x67452301;
+            let b0 = 0xEFCDAB89;
+            let c0 = 0x98BADCFE;
+            let d0 = 0x10325476;
+            
+            // Process each 512-bit chunk
+            for (let i = 0; i < msg.length; i += 64) {
+                let M = new Array(16);
+                for (let j = 0; j < 16; j++) {
+                    M[j] = 
+                        (msg[i + j*4] & 0xFF) |
+                        ((msg[i + j*4 + 1] & 0xFF) << 8) |
+                        ((msg[i + j*4 + 2] & 0xFF) << 16) |
+                        ((msg[i + j*4 + 3] & 0xFF) << 24);
+                }
+                
+                let A = a0;
+                let B = b0;
+                let C = c0;
+                let D = d0;
+                
+                // Round 1
+                A = ff(A, B, C, D, M[0], 7, 0xD76AA478);
+                D = ff(D, A, B, C, M[1], 12, 0xE8C7B756);
+                C = ff(C, D, A, B, M[2], 17, 0x242070DB);
+                B = ff(B, C, D, A, M[3], 22, 0xC1BDCEEE);
+                A = ff(A, B, C, D, M[4], 7, 0xF57C0FAF);
+                D = ff(D, A, B, C, M[5], 12, 0x4787C62A);
+                C = ff(C, D, A, B, M[6], 17, 0xA8304613);
+                B = ff(B, C, D, A, M[7], 22, 0xFD469501);
+                A = ff(A, B, C, D, M[8], 7, 0x698098D8);
+                D = ff(D, A, B, C, M[9], 12, 0x8B44F7AF);
+                C = ff(C, D, A, B, M[10], 17, 0xFFFF5BB1);
+                B = ff(B, C, D, A, M[11], 22, 0x895CD7BE);
+                A = ff(A, B, C, D, M[12], 7, 0x6B901122);
+                D = ff(D, A, B, C, M[13], 12, 0xFD987193);
+                C = ff(C, D, A, B, M[14], 17, 0xA679438E);
+                B = ff(B, C, D, A, M[15], 22, 0x49B40821);
+                
+                // Round 2
+                A = gg(A, B, C, D, M[1], 5, 0xF61E2562);
+                D = gg(D, A, B, C, M[6], 9, 0xC040B340);
+                C = gg(C, D, A, B, M[11], 14, 0x265E5A51);
+                B = gg(B, C, D, A, M[0], 20, 0xE9B6C7AA);
+                A = gg(A, B, C, D, M[5], 5, 0xD62F105D);
+                D = gg(D, A, B, C, M[10], 9, 0x02441453);
+                C = gg(C, D, A, B, M[15], 14, 0xD8A1E681);
+                B = gg(B, C, D, A, M[4], 20, 0xE7D3FBC8);
+                A = gg(A, B, C, D, M[9], 5, 0x21E1CDE6);
+                D = gg(D, A, B, C, M[14], 9, 0xC33707D6);
+                C = gg(C, D, A, B, M[3], 14, 0xF4D50D87);
+                B = gg(B, C, D, A, M[8], 20, 0x455A14ED);
+                A = gg(A, B, C, D, M[13], 5, 0xA9E3E905);
+                D = gg(D, A, B, C, M[2], 9, 0xFCEFA3F8);
+                C = gg(C, D, A, B, M[7], 14, 0x676F02D9);
+                B = gg(B, C, D, A, M[12], 20, 0x8D2A4C8A);
+                
+                // Round 3
+                A = hh(A, B, C, D, M[5], 4, 0xFFFA3942);
+                D = hh(D, A, B, C, M[8], 11, 0x8771F681);
+                C = hh(C, D, A, B, M[11], 16, 0x6D9D6122);
+                B = hh(B, C, D, A, M[14], 23, 0xFDE5380C);
+                A = hh(A, B, C, D, M[1], 4, 0xA4BEEA44);
+                D = hh(D, A, B, C, M[4], 11, 0x4BDECFA9);
+                C = hh(C, D, A, B, M[7], 16, 0xF6BB4B60);
+                B = hh(B, C, D, A, M[10], 23, 0xBEBFBC70);
+                A = hh(A, B, C, D, M[13], 4, 0x289B7EC6);
+                D = hh(D, A, B, C, M[0], 11, 0xEAA127FA);
+                C = hh(C, D, A, B, M[3], 16, 0xD4EF3085);
+                B = hh(B, C, D, A, M[6], 23, 0x04881D05);
+                A = hh(A, B, C, D, M[9], 4, 0xD9D4D039);
+                D = hh(D, A, B, C, M[12], 11, 0xE6DB99E5);
+                C = hh(C, D, A, B, M[15], 16, 0x1FA27CF8);
+                B = hh(B, C, D, A, M[2], 23, 0xC4AC5665);
+                
+                // Round 4
+                A = ii(A, B, C, D, M[0], 6, 0xF4292244);
+                D = ii(D, A, B, C, M[7], 10, 0x432AFF97);
+                C = ii(C, D, A, B, M[14], 15, 0xAB9423A7);
+                B = ii(B, C, D, A, M[5], 21, 0xFC93A039);
+                A = ii(A, B, C, D, M[12], 6, 0x655B59C3);
+                D = ii(D, A, B, C, M[3], 10, 0x8F0CCC92);
+                C = ii(C, D, A, B, M[10], 15, 0xFFEFF47D);
+                B = ii(B, C, D, A, M[1], 21, 0x85845DD1);
+                A = ii(A, B, C, D, M[8], 6, 0x6FA87E4F);
+                D = ii(D, A, B, C, M[15], 10, 0xFE2CE6E0);
+                C = ii(C, D, A, B, M[6], 15, 0xA3014314);
+                B = ii(B, C, D, A, M[13], 21, 0x4E0811A1);
+                A = ii(A, B, C, D, M[4], 6, 0xF7537E82);
+                D = ii(D, A, B, C, M[11], 10, 0xBD3AF235);
+                C = ii(C, D, A, B, M[2], 15, 0x2AD7D2BB);
+                B = ii(B, C, D, A, M[9], 21, 0xEB86D391);
+                
+                a0 = (a0 + A) >>> 0;
+                b0 = (b0 + B) >>> 0;
+                c0 = (c0 + C) >>> 0;
+                d0 = (d0 + D) >>> 0;
+            }
+            
+            // Convert to little-endian byte array
+            let result = new Array(16);
+            result[0] = (a0 & 0xFF);
+            result[1] = ((a0 >>> 8) & 0xFF);
+            result[2] = ((a0 >>> 16) & 0xFF);
+            result[3] = ((a0 >>> 24) & 0xFF);
+            result[4] = (b0 & 0xFF);
+            result[5] = ((b0 >>> 8) & 0xFF);
+            result[6] = ((b0 >>> 16) & 0xFF);
+            result[7] = ((b0 >>> 24) & 0xFF);
+            result[8] = (c0 & 0xFF);
+            result[9] = ((c0 >>> 8) & 0xFF);
+            result[10] = ((c0 >>> 16) & 0xFF);
+            result[11] = ((c0 >>> 24) & 0xFF);
+            result[12] = (d0 & 0xFF);
+            result[13] = ((d0 >>> 8) & 0xFF);
+            result[14] = ((d0 >>> 16) & 0xFF);
+            result[15] = ((d0 >>> 24) & 0xFF);
+            
+            // Convert to hex string
+            let hex = '';
+            for (let i = 0; i < result.length; i++) {
+                hex += ((result[i] < 16) ? '0' : '') + result[i].toString(16);
+            }
+            
+            return hex;
+        }
+        
+        // Helper functions for MD5
+        function stringToUtf8Array(str) {
+            const utf8 = [];
+            for (let i = 0; i < str.length; i++) {
+                let charcode = str.charCodeAt(i);
+                if (charcode < 0x80) utf8.push(charcode);
+                else if (charcode < 0x800) {
+                    utf8.push(0xc0 | (charcode >> 6),
+                              0x80 | (charcode & 0x3f));
+                } else if (charcode < 0xd800 || charcode >= 0xe000) {
+                    utf8.push(0xe0 | (charcode >> 12),
+                              0x80 | ((charcode >> 6) & 0x3f),
+                              0x80 | (charcode & 0x3f));
+                } else {
+                    i++;
+                    charcode = 0x10000 + (((charcode & 0x3ff) << 10) | (str.charCodeAt(i) & 0x3ff));
+                    utf8.push(0xf0 | (charcode >> 18),
+                              0x80 | ((charcode >> 12) & 0x3f),
+                              0x80 | ((charcode >> 6) & 0x3f),
+                              0x80 | (charcode & 0x3f));
+                }
+            }
+            return utf8;
+        }
+        
+        function padMessage(msg) {
+            const msgLen = msg.length;
+            const padLen = (((msgLen + 8) >>> 6) + 1) << 6;
+            const padded = new Array(padLen);
+            
+            for (let i = 0; i < padLen; i++) {
+                padded[i] = i < msgLen ? msg[i] : 0;
+            }
+            
+            padded[msgLen] = 0x80;
+            
+            // Append length in bits (little-endian)
+            const lenBits = msgLen * 8;
+            padded[padLen - 8] = (lenBits & 0xFF);
+            padded[padLen - 7] = ((lenBits >>> 8) & 0xFF);
+            padded[padLen - 6] = ((lenBits >>> 16) & 0xFF);
+            padded[padLen - 5] = ((lenBits >>> 24) & 0xFF);
+            padded[padLen - 4] = 0;
+            padded[padLen - 3] = 0;
+            padded[padLen - 2] = 0;
+            padded[padLen - 1] = 0;
+            
+            return padded;
+        }
+        
+        // MD5 auxiliary functions
+        function f(x, y, z) { return (x & y) | (~x & z); }
+        function g(x, y, z) { return (x & z) | (y & ~z); }
+        function h(x, y, z) { return x ^ y ^ z; }
+        function i(x, y, z) { return y ^ (x | ~z); }
+        
+        // MD5 round functions
+        function ff(a, b, c, d, x, s, ac) {
+            a += f(b, c, d) + x + ac;
+            a = ((a << s) | (a >>> (32 - s)));
+            a += b;
+            return a >>> 0;
+        }
+        
+        function gg(a, b, c, d, x, s, ac) {
+            a += g(b, c, d) + x + ac;
+            a = ((a << s) | (a >>> (32 - s)));
+            a += b;
+            return a >>> 0;
+        }
+        
+        function hh(a, b, c, d, x, s, ac) {
+            a += h(b, c, d) + x + ac;
+            a = ((a << s) | (a >>> (32 - s)));
+            a += b;
+            return a >>> 0;
+        }
+        
+        function ii(a, b, c, d, x, s, ac) {
+            a += i(b, c, d) + x + ac;
+            a = ((a << s) | (a >>> (32 - s)));
+            a += b;
+            return a >>> 0;
+        }
+        
+        // Visualization functions
+        function createHashVisualization(hash) {
+            const container = document.getElementById('hash-visualization');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < hash.length; i += 2) {
+                const byte = document.createElement('div');
+                byte.className = 'hash-byte';
+                byte.textContent = hash.substring(i, i+2);
+                byte.title = Byte ${i/2}: 0x${hash.substring(i, i+2)};
+                container.appendChild(byte);
+            }
+            
+            // Animate the visualization
+            const bytes = container.querySelectorAll('.hash-byte');
+            bytes.forEach((byte, index) => {
+                setTimeout(() => {
+                    byte.classList.add('active');
+                }, index * 50);
+            });
+        }
+        
+        // Event listeners
+        document.getElementById('hash-button').addEventListener('click', function() {
+            const input = document.getElementById('input-text').value;
+            const hash = md5(input);
+            document.getElementById('hash-value').textContent = hash;
+            createHashVisualization(hash);
+        });
+        
+        // Initialize with default value
+        document.addEventListener('DOMContentLoaded', function() {
+            createHashVisualization('82a9f0f0d38c88d571d7f547e6a0a5f7');
+        });
+    </script>
+</body>
+</html>
